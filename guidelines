@@ -1,0 +1,23 @@
+//FastQ to Avro
+
+hadoop jar target/contrail-1.0-SNAPSHOT-job.jar contrail.correct.FastQtoAvro --inputpath=ContrailPlus/QuakePair1 --outputpath=ContrailPlus/Quake_Pair_1_Avro
+
+
+//join
+hadoop jar target/contrail-1.0-SNAPSHOT-job.jar contrail.correct.pigAvroRecordJoin --inputpath1=ContrailPlus/QuakePair1 --inputPath2=ContrailPlus.QuakePair2 --outputpath=ContrailPlus/Quake_Join
+_Out
+
+
+//Building partial Bithashes
+
+hadoop jar target/contrail-1.0-SNAPSHOT-job.jar contrail.correct.localBitHash --inputpath=ContrailPlus/PrunedKmerCount --outputpath=ContrailPlus/PartialBithashes --QuakeHome=/home/avijit/contrail-avrotest/quake --tempWritableFolder=/home/avijit/contrail-bio/work --QuakeLocalInput=QuakeData --cutoff=3 --K=13
+
+//Building global Bithash
+
+hadoop jar target/contrail-1.0-SNAPSHOT-job.jar contrail.correct.CreateGlobalBitHash --inputpath=ContrailPlus/PartialBithashes --outputpath=ContrailPlus/GlobalBithash
+
+//Quake compatible bithashes
+hadoop jar target/contrail-1.0-SNAPSHOT-job.jar contrail.correct.generateQuakeCompatibleBithash --inputpath=ContrailPlus/GlobalBithash --QuakeHome=/home/avijit/contrail-avrotest/quake --tempWritableFolder=/home/avijit/contrail-bio/work --QuakeTempFolderName=QuakeData
+
+//Quake correct invocation stub
+hadoop jar target/contrail-1.0-SNAPSHOT-job.jar contrail.correct.CorrectSinglesInvocationStub --inputpath=ContrailPlus/Singles_Avro --QuakeHome=/home/avijit/contrail-avrotest/quake --tempWritableFolder=/home/avijit/contrail-bio/work --QuakeLocalInput=QuakeData --outputpath=ContrailPlus/QuakeSinglesOut --K=13
